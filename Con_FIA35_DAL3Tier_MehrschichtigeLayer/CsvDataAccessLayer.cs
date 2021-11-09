@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CsvHelper;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +22,15 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
 
         public List<Person> SelectAllPersons()
         {
-            throw new NotImplementedException();
+            List<Person> PersonenListe = new();
+
+            using (var reader = new StreamReader("Personen.csv"))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+                PersonenListe = csv.GetRecords<Person>().ToList();
+            }
+            return PersonenListe;
+
         }
 
         public Person SelectPersonById(int Id)
