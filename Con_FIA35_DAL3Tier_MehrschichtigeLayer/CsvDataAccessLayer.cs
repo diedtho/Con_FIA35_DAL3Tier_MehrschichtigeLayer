@@ -35,12 +35,30 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
 
         public Person SelectPersonById(int Id)
         {
-            throw new NotImplementedException();
+            List<Person> PersonenListe = SelectAllPersons();
+            return PersonenListe.FirstOrDefault(p => p.PID == Id);
+
+            
         }
 
         public bool UpdatePerson(Person person)
         {
-            throw new NotImplementedException();
+
+            List<Person> PersonenListe = SelectAllPersons();
+            Person p = PersonenListe.FirstOrDefault(p => p.PID == person.PID);
+
+            p.Vorname = person.Vorname;
+            p.Nachname = person.Nachname;
+            p.Geburtsdatum = person.Geburtsdatum;
+            p.HatKundenkarte = person.HatKundenkarte;
+
+            using (var writer = new StreamWriter("Personen.csv"))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.WriteRecords(PersonenListe);
+            }
+
+            return true;
         }
     }
 }
