@@ -10,15 +10,20 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
 {
     internal class CsvDataAccessLayer : IDaten
     {
+
+        List<Person> Personenliste;
+
+        public CsvDataAccessLayer()
+        {
+            
+            // Csv-Konfiguration Delimiter usw. ...
+        }
+
         public bool DeletePerson(Person person)
         {
             throw new NotImplementedException();
         }
-
-        public bool InsertPerson(Person person)
-        {
-            throw new NotImplementedException();
-        }
+               
 
         public List<Person> SelectAllPersons()
         {
@@ -38,7 +43,6 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
             List<Person> PersonenListe = SelectAllPersons();
             return PersonenListe.FirstOrDefault(p => p.PID == Id);
 
-            
         }
 
         public bool UpdatePerson(Person person)
@@ -51,14 +55,36 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
             p.Nachname = person.Nachname;
             p.Geburtsdatum = person.Geburtsdatum;
             p.HatKundenkarte = person.HatKundenkarte;
+            Wegschreiben(PersonenListe);
 
+            return true;
+        }
+
+        
+        int IDaten.InsertPerson(Person person)
+        {
+            int NeueMaxId = 0;
+
+            NeueMaxId = Personenliste.Max(p => p.PID) + 1;
+            Personenliste.Add(person);
+
+            // Wegschreiben
+            Wegschreiben(Personenliste);
+
+            return NeueMaxId;
+
+        }
+
+        private static void Wegschreiben(List<Person> PersonenListe)
+        {
             using (var writer = new StreamWriter("Personen.csv"))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 csv.WriteRecords(PersonenListe);
             }
-
-            return true;
         }
+
+
+
     }
 }

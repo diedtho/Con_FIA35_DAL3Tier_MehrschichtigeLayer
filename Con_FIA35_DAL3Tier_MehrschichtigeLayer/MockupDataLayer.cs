@@ -21,16 +21,22 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
 
         public bool DeletePerson(Person person)
         {
-            Personenliste.Remove(person);
-
-            return true;
+            bool geklappt = false;
+            geklappt = Personenliste.Remove(person);
+            
+            return geklappt;
         }
 
-        public bool InsertPerson(Person person)
+        public int InsertPerson(Person person)
         {
+            int NeueMaxId;
+
+            NeueMaxId = Personenliste.Max(p => p.PID) + 1;
+            person.PID = NeueMaxId;
             Personenliste.Add(person);
 
-            return true;
+            return NeueMaxId;
+      
         }
                 
 
