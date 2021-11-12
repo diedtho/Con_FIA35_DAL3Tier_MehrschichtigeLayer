@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,26 +12,39 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
     internal class CsvDataAccessLayer : IDaten
     {
 
-        List<Person> Personenliste;
+        List<Person> PersonenListe;
+        CsvConfiguration conf;
 
         public CsvDataAccessLayer()
         {
-            
-            // Csv-Konfiguration Delimiter usw. ...
+            conf = new CsvConfiguration(new CultureInfo("DE-de")) { Delimiter = ";" };
+
+            using (var reader = new StreamReader("Personen.csv"))
+            using (var csv = new CsvReader(reader, conf))
+            {
+                PersonenListe = csv.GetRecords<Person>().ToList();
+            }
+
+
         }
 
         public bool DeletePerson(Person person)
         {
-            throw new NotImplementedException();
+            bool geklappt = PersonenListe.Remove(person);
+
+            // CSV "Wegschreiben" (Sichern bzw. Speichern)
+            Wegschreiben();
+
+            return geklappt;
         }
-               
+
 
         public List<Person> SelectAllPersons()
         {
-            List<Person> PersonenListe = new();
+            
 
             using (var reader = new StreamReader("Personen.csv"))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            using (var csv = new CsvReader(reader, conf))
             {
                 PersonenListe = csv.GetRecords<Person>().ToList();
             }
@@ -40,7 +54,6 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
 
         public Person SelectPersonById(int Id)
         {
-            List<Person> PersonenListe = SelectAllPersons();
             return PersonenListe.FirstOrDefault(p => p.PID == Id);
 
         }
@@ -48,37 +61,45 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
         public bool UpdatePerson(Person person)
         {
 
-            List<Person> PersonenListe = SelectAllPersons();
+            
             Person p = PersonenListe.FirstOrDefault(p => p.PID == person.PID);
 
-            p.Vorname = person.Vorname;
-            p.Nachname = person.Nachname;
-            p.Geburtsdatum = person.Geburtsdatum;
-            p.HatKundenkarte = person.HatKundenkarte;
-            Wegschreiben(PersonenListe);
+            if (p != null)
+            {
+                p.Vorname = person.Vorname;
+                p.Nachname = person.Nachname;
+                p.Geburtsdatum = person.Geburtsdatum;
+                p.HatKundenkarte = person.HatKundenkarte;
+                Wegschreiben();
 
-            return true;
+                return true;
+            }
+
+            return false;
         }
 
-        
+
         int IDaten.InsertPerson(Person person)
         {
             int NeueMaxId = 0;
 
-            NeueMaxId = Personenliste.Max(p => p.PID) + 1;
-            Personenliste.Add(person);
+            NeueMaxId = PersonenListe.Max(p => p.PID) + 1;
+            person.PID = NeueMaxId;
+            PersonenListe.Add(person);
 
             // Wegschreiben
-            Wegschreiben(Personenliste);
+            Wegschreiben();
 
             return NeueMaxId;
 
         }
 
-        private static void Wegschreiben(List<Person> PersonenListe)
+        // Hilfsmethode
+        private void Wegschreiben()
         {
+
             using (var writer = new StreamWriter("Personen.csv"))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            using (var csv = new CsvWriter(writer, conf))
             {
                 csv.WriteRecords(PersonenListe);
             }

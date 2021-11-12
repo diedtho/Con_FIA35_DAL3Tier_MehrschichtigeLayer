@@ -65,7 +65,7 @@ namespace Con_FIA35_DAL3Tier_MehrschichtigeLayer
         public List<Person> AlleKartenInhaber()
         {
             List<Person> PersonenListe = DatenZugriff.SelectAllPersons();
-            return PersonenListe.FindAll(p => p.HatKundenkarte == true);
+            return PersonenListe.FindAll(p => p.HatKundenkarte);
 
         }
 

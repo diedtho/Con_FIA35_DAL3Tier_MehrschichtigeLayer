@@ -1,4 +1,4 @@
-﻿#PID;Vorname;Nachname;Geburtsdatum;HatKundenkarte
+﻿PID;Vorname;Nachname;Geburtsdatum;HatKundenkarte
 1;Ute;Unruh;11.1963;true
 2;Hein;Blöd;01.04.1977;false
 3;Berta;Breit;06.05.1981;true
